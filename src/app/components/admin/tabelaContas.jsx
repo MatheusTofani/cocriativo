@@ -31,21 +31,19 @@ export default function TabelaContas() {
     setUsuarioEditando(usuario);
     setEmailEditado(usuario.email);
     setRoleEditado(usuario.role);
-    setSenhaEditada("");
+    setSenhaEditada(""); // limpa ao abrir
   }
 
   async function salvarEdicao(e) {
     e.preventDefault();
     try {
-      const updateData = {
+      const novosDados = {
         email: emailEditado,
         role: roleEditado,
+        ...(senhaEditada && { senha: senhaEditada }),
       };
-      if (senhaEditada.trim()) {
-        updateData.senha = senhaEditada;
-      }
 
-      await updateDoc(doc(db, "usuarios", usuarioEditando.id), updateData);
+      await updateDoc(doc(db, "usuarios", usuarioEditando.id), novosDados);
       setUsuarioEditando(null);
       fetchUsuarios();
     } catch (err) {
@@ -64,56 +62,51 @@ export default function TabelaContas() {
   }
 
   return (
-    <div className="mt-8 space-y-6">
-      <h3 className="text-[#61482a] font-bold mb-5 text-[20px]">Contas Criadas</h3>
+    <div className="px-8 py-6">
+      <h2 className="text-[#61482a] font-bold text-[20px] mb-4">Contas Criadas</h2>
       <div className="overflow-auto">
         <table className="min-w-full bg-white border border-[#BFB4AE] rounded-xl text-[#61482a]">
-          <thead className="bg-[#f5efec] border-b border-[#BFB4AE] text-left">
+          <thead className="bg-[#f5efec]">
             <tr>
-              <th className="px-4 py-3 w-[60px]">ID</th>
-              <th className="px-4 py-3 w-[250px]">Email</th>
-              <th className="px-4 py-3 w-[180px]">Permissão</th>
-              <th className="px-4 py-3 w-[140px]">Ações</th>
+              <th className="text-left px-4 py-3">Email</th>
+              <th className="text-left px-4 py-3">Permissão</th>
+              <th className="text-left px-4 py-3">Ações</th>
             </tr>
           </thead>
           <tbody>
-            {usuarios.map((usuario, index) => (
+            {usuarios.map((u) => (
               <tr
-                key={usuario.id}
-                className="border-b border-[#f0e7e3] hover:bg-[#f9f5f3] transition"
+                key={u.id}
+                className="border-b border-[#eee] hover:bg-[#f9f5f3] transition"
               >
-                <td className="px-4 py-2">{index + 1}</td>
-                <td className="px-4 py-2">{usuario.email}</td>
-                <td className="px-4 py-2 capitalize">{usuario.role}</td>
+                <td className="px-4 py-2">{u.email}</td>
+                <td className="px-4 py-2 capitalize">{u.role}</td>
                 <td className="px-4 py-2 flex gap-2">
                   <button
-                    onClick={() => abrirEditar(usuario)}
+                    onClick={() => abrirEditar(u)}
                     className="px-3 py-1 text-sm rounded bg-yellow-500 text-white hover:bg-yellow-600"
                   >
                     Editar
                   </button>
                   <button
-                    onClick={() => setUsuarioRemovendo(usuario)}
+                    onClick={() => setUsuarioRemovendo(u)}
                     className="px-3 py-1 text-sm rounded bg-red-500 text-white hover:bg-red-600"
                   >
-                    Deletar
+                    Remover
                   </button>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-
-        {usuarios.length === 0 && (
-          <div className="text-center text-[#8d402c] mt-4 font-medium">
-            Nenhuma conta encontrada.
-          </div>
-        )}
       </div>
 
       {/* Modal Editar */}
       {usuarioEditando && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000050]" onClick={() => setUsuarioEditando(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000050]"
+          onClick={() => setUsuarioEditando(null)}
+        >
           <div
             onClick={(e) => e.stopPropagation()}
             className="bg-white p-6 rounded-xl max-w-md w-[95%] relative"
@@ -164,7 +157,10 @@ export default function TabelaContas() {
 
       {/* Modal Remover */}
       {usuarioRemovendo && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000050]" onClick={() => setUsuarioRemovendo(null)}>
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000050]"
+          onClick={() => setUsuarioRemovendo(null)}
+        >
           <div
             onClick={(e) => e.stopPropagation()}
             className="bg-white p-6 rounded-xl max-w-sm w-[90%] relative"

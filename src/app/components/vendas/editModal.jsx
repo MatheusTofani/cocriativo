@@ -56,7 +56,7 @@ export default function EditarVendaModal({ venda, onClose, onAtualizar }) {
     async function handleSubmit(e) {
         e.preventDefault();
         try {
-            const ref = doc(db, "vendas", venda.idFirebase);
+            const ref = doc(db, "vendas", venda.id);
             await updateDoc(ref, {
                 produtoId,
                 valor: Number(valor),
@@ -73,13 +73,15 @@ export default function EditarVendaModal({ venda, onClose, onAtualizar }) {
         }
     }
 
-    const produtosFiltrados = produtos.filter((p) => {
-        const busca = buscaProduto.toLowerCase();
-        return (
-            p.nome.toLowerCase().includes(busca) ||
-            p.id.toLowerCase().includes(busca)
-        );
-    });
+const produtosFiltrados = produtos.filter((p) => {
+    const busca = buscaProduto.toLowerCase();
+    return (
+        (p.nome?.toLowerCase() ?? "").includes(busca) ||
+        (p.id?.toLowerCase() ?? "").includes(busca)
+    );
+});
+
+
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000050]" onClick={onClose}>

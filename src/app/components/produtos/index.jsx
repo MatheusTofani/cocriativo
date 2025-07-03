@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { db } from "../../data/firebase";
-import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp, updateDoc } from "firebase/firestore";
 
 export default function ProdutosModal() {
     const [isOpen, setIsOpen] = useState(false);
@@ -30,7 +30,12 @@ export default function ProdutosModal() {
         }
 
         try {
-            await addDoc(collection(db, "produtos"), produto);
+            const docRef = await addDoc(collection(db, "produtos"), produto);
+
+            // Salva o ID dentro do próprio documento
+            await updateDoc(docRef, {
+                id: docRef.id,
+            });
 
             // limpar inputs e fechar
             setNome("");
@@ -53,7 +58,6 @@ export default function ProdutosModal() {
         "Datiza Velas Aromáticas",
         "Francine Moreira",
     ];
-
 
     return (
         <>
@@ -110,13 +114,11 @@ export default function ProdutosModal() {
                                 <option value="" disabled>
                                     Selecione a marca
                                 </option>
-                                <option value="Open House">Open House</option>
-                                <option value="Visionaire">Visionaire</option>
-                                <option value="Jaqueline Braga">Jaqueline Braga</option>
-                                <option value="Art Tábuas">Art Tábuas</option>
-                                <option value="DP Semijoias">DP Semijoias</option>
-                                <option value="Datiza Velas Aromáticas">Datiza Velas Aromáticas</option>
-                                <option value="Francine Moreira">Francine Moreira</option>
+                                {marcasDisponiveis.map((m) => (
+                                    <option key={m} value={m}>
+                                        {m}
+                                    </option>
+                                ))}
                             </select>
 
                             <input
